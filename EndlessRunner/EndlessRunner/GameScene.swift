@@ -8,54 +8,79 @@
 
 import SpriteKit
 import GameplayKit
+import CoreMotion
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
+    var backgroundNode: SKNode!
+    var midgroundNode: SKNode!
+    var foregroundNode: SKNode!
     
-    private var label : SKLabelNode?
+    var player: SKNode!// Tap to Start
     
-    override func didMove(to view: SKView) {
+    var scaleFactor: CGFloat!
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    override init(size: CGSize) {
+        super.init(size: size)
         
-        // Get label node from scene and store it for use later
-        self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-        if let label = self.label {
-            label.alpha = 0.0
-            label.run(SKAction.fadeIn(withDuration: 2.0))
-        }
-    }
-    
-    
-    func touchDown(atPoint pos : CGPoint) {
- 
-    }
-    
-    func touchMoved(toPoint pos : CGPoint) {
-  
-    }
-    
-    func touchUp(atPoint pos : CGPoint) {
-    
-    }
-    
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        if let label = self.label {
-            label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
-        }
+        // Add some gravity
+        physicsWorld.gravity = CGVector(dx: 0.0, dy: -5.0)
         
-        for t in touches { self.touchDown(atPoint: t.location(in: self)) }
+        // Set contact delegate
+        physicsWorld.contactDelegate = self
+        scaleFactor = self.size.width / 320.0
+
+        
+        backgroundColor = SKColor.white
+        
+        foregroundNode = SKNode()
+        addChild(foregroundNode)
+        
+        player = createPlayer()
+        foregroundNode.addChild(player)
+        
+        
+        backgroundNode = createBackgroundNode()
+        addChild(backgroundNode)
+        
+        player.physicsBody?.isDynamic = true
+        
+        // 4
+        player.physicsBody?.applyImpulse(CGVector(dx: 0.0, dy: 50.0))
     }
     
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
+    func createPlayer() -> SKNode {
+        let playerNode = SKNode()
+        playerNode.position = CGPoint(x: self.size.width * 0.1, y: self.size.height * 0.2)
+        
+        let sprite = SKSpriteNode(imageNamed: "Player")
+        playerNode.addChild(sprite)
+        
+        // 1
+        playerNode.physicsBody = SKPhysicsBody(circleOfRadius: sprite.size.width / 2)
+        // 2
+        playerNode.physicsBody?.isDynamic = false
+        // 3
+        playerNode.physicsBody?.allowsRotation = false
+        // 4
+        playerNode.physicsBody?.restitution = 1.0
+        playerNode.physicsBody?.friction = 0.0
+        playerNode.physicsBody?.angularDamping = 0.0
+        playerNode.physicsBody?.linearDamping = 0.0
+        
+        return playerNode
     }
     
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
+    func createBackgroundNode() -> SKNode {
+        // 1
+        // Create the node
+        let backgroundNode = SKNode()
+        
+        return backgroundNode
     }
-    
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-    }
-    
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
