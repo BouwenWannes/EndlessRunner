@@ -36,7 +36,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         backgroundColor = SKColor.white
         
-        foregroundNode = SKNode()
+        foregroundNode = createForegroundNode()
         addChild(foregroundNode)
         
         player = createPlayer()
@@ -74,10 +74,34 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return playerNode
     }
     
+    func createForegroundNode() -> SKNode {
+        let foregroundNode = SKNode()
+        
+        let xSpacing = 32.0 * scaleFactor
+        for index in 0...19 {
+            // 3
+            let node = SKSpriteNode(imageNamed: "tile")
+            // 4
+            node.setScale(scaleFactor)
+            node.anchorPoint = CGPoint(x: 0.5, y: 0.0)
+            node.position = CGPoint(x: xSpacing * CGFloat(index), y: 0)
+            //5
+            foregroundNode.addChild(node)
+        }
+        
+        return foregroundNode
+    }
+    
     func createBackgroundNode() -> SKNode {
         // 1
         // Create the node
         let backgroundNode = SKNode()
+        
+        let node = SKSpriteNode(imageNamed: "BG2")
+        
+        node.setScale(scaleFactor)
+        
+        backgroundNode.addChild(node)
         
         return backgroundNode
     }
